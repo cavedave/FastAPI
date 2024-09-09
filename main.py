@@ -10,6 +10,10 @@ import secrets
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import os
 
 load_dotenv(".env")
 
@@ -37,21 +41,51 @@ class LeadSchema(BaseModel):
     id: Optional[str]
 
 
-def send_email(subject, message, to_address):
+#def send_email(subject, message, to_address):
     # Your send_email logic, unchanged from before
-    from_address = 'ryan@smartbids.ai'
-    password = os.getenv("EMAIL_PASS")
+    #api_key = os.getenv("EMAILOCTOPUS_API_KEY")
+    #from_address = 'ryan@smartbids.ai'
+    #password = os.getenv("EMAIL_PASS")
+    #msg = MIMEMultipart()
+    #msg['From'] = "Nuala.ai - Email verification <" + from_address + ">"
+    #msg['To'] = to_address
+    #msg['Subject'] = subject
+    #msg.attach(MIMEText(message, 'html'))
+    #server = smtplib.SMTP_SSL('https://emailoctopus.com/api/1.6/email/send', 465)
+    #server.login(from_address, password)
+    #text = msg.as_string()
+    #server.sendmail(from_address, to_address, text)
+    #server.quit()
+
+
+
+
+
+def send_email(subject, message, to_address):
+    # Gmail account credentials
+    from_address = os.getenv('GMAIL_USER')  # Your Gmail email address
+    password = os.getenv('GMAIL_PASS')  # Your Gmail password (or App Password if 2FA is enabled)
+    
+    # Create the email content
     msg = MIMEMultipart()
-    msg['From'] = "SmartBids.ai - Email verification <" + from_address + ">"
+    msg['From'] = f"Your Name <{from_address}>"
     msg['To'] = to_address
     msg['Subject'] = subject
     msg.attach(MIMEText(message, 'html'))
-    server = smtplib.SMTP_SSL('mail.privateemail.com', 465)
-    server.login(from_address, password)
-    text = msg.as_string()
-    server.sendmail(from_address, to_address, text)
-    server.quit()
+    
+    # Connect to Gmail's SMTP server
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)  # Connect to the server
+        server.starttls()  # Secure the connection with TLS
+        server.login(from_address, password)  # Login to Gmail
+        server.sendmail(from_address, to_address, msg.as_string())  # Send email
+        server.quit()  # Quit the server
+        print("Email sent successfully!")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
 
+# Example usage
+# Esend_email("Test Subject", "<p>This is a test email.</p>", to_address)
 
 @app.post("/create_lead")
 async def create_lead(lead: LeadSchema):
