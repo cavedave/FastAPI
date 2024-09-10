@@ -20,13 +20,15 @@ load_dotenv(".env")
 app = FastAPI()
 
 # MongoDB setup
-mongo_uri = os.environ['MONGO_AUTH']
+# mongo_uri = os.environ['MONGO_AUTH']
+mongo_uri = os.env['MONGO_AUTH']
 client = MongoClient(mongo_uri)
 db = client['smartbids']
 users_collection = db['users']
 leads_collection = db['leads']
 
-email_base_url = os.environ['EMAIL_BASE_URL']
+# email_base_url = os.environ['EMAIL_BASE_URL']
+email_base_url = os.env['EMAIL_BASE_URL']
 
 
 class EmailSchema(BaseModel):
